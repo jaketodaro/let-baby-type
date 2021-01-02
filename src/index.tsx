@@ -39,6 +39,8 @@ const ENTER_EFFECTS = {
   bounceInBck: "scaleOutCenter",
 };
 
+const IS_MOBILE = !!navigator.userAgent.match(/Android|iPhone/);
+
 // Add Floaties
 for (let i = 0; i < NUM_FLOATIES; ++i) {
   const floatyContainer = document.createElement("div");
@@ -59,16 +61,29 @@ for (let i = 0; i < NUM_FLOATIES; ++i) {
 }
 
 // Listen for baby smashing
-document.body.addEventListener("keydown", (event) => {
-  //   event.preventDefault();
-  popupChar(event.key);
-});
-document.body.addEventListener("keyup", (event) => {
-  event.preventDefault();
-});
-document.body.addEventListener("keypress", (event) => {
-  event.preventDefault();
-});
+// On mobile we need to use a hidden input to get key presses
+if (IS_MOBILE) {
+  forceKeyboardOpen();
+
+  document.body.addEventListener("keyup", () => {
+    const input = document.getElementById("input");
+
+    if (input instanceof HTMLInputElement) {
+      popupChar(input.value.slice(-1));
+    }
+  });
+} else {
+  document.body.addEventListener("keydown", (event) => {
+    event.preventDefault();
+    popupChar(event.key);
+  });
+  document.body.addEventListener("keypress", (event) => {
+    event.preventDefault();
+  });
+  document.body.addEventListener("keyup", (event) => {
+    event.preventDefault();
+  });
+}
 
 // Make it harder for baby to close the window
 window.onbeforeunload = (event: BeforeUnloadEvent) => {
@@ -120,4 +135,11 @@ function popupChar(char: string) {
 
   document.body.appendChild(div);
   lastDiv = div;
+}
+
+function forceKeyboardOpen() {
+  requestAnimationFrame(() => {
+    document.getElementById("input")?.focus();
+    forceKeyboardOpen();
+  });
 }
