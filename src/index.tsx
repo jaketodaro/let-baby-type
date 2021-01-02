@@ -96,7 +96,7 @@ if (IS_MOBILE) {
 
 // Make it harder for baby to close the window
 window.onbeforeunload = (event: BeforeUnloadEvent) => {
-  //   event.returnValue = "";
+    event.returnValue = "";
 };
 
 function getRandomChar() {
