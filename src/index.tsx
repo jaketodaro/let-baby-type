@@ -1,6 +1,7 @@
 import "./index.css";
 
-const FLOATY_CHARS = "⌯★☆✦✧⬢⬡▲△⬟⬠❄❅❆☺☻➤➼";
+const FLOATY_SHAPES = "★☆✦✧⬢⬡▲△⬟⬠❅❆☿♀♁♂♃♄♅⛢♆♩♪♫♬♡♥";
+const FLOATY_ROTATABLE_SHAPES = "⌯➤➼";
 const FLOATY_DURATION = 5000;
 const NUM_FLOATIES = 30;
 
@@ -53,6 +54,14 @@ for (let i = 0; i < NUM_FLOATIES; ++i) {
   floatyContainer.style.fontSize = 1 + Math.random() * 4 + "rem";
   floatyContainer.style.animationDelay = floatyDelay;
 
+  const char = getRandomChar();
+
+  if (FLOATY_ROTATABLE_SHAPES.includes(char)) {
+    floatyContainer.style.transform = `rotate(${
+      Math.floor(Math.random() * 3) * 90
+    }deg)`;
+  }
+
   floatyContent.innerText = getRandomChar();
   playEffect(floatyContent);
 
@@ -91,7 +100,8 @@ window.onbeforeunload = (event: BeforeUnloadEvent) => {
 };
 
 function getRandomChar() {
-  return FLOATY_CHARS.charAt(Math.floor(Math.random() * FLOATY_CHARS.length));
+  const chars = FLOATY_SHAPES + FLOATY_ROTATABLE_SHAPES
+  return chars.charAt(Math.floor(Math.random() * chars.length));
 }
 
 function getRandomEffect() {
