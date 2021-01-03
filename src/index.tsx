@@ -98,9 +98,12 @@ const ENTER_EFFECTS = {
   rotateInDiag: "rotateOutDiag",
   swirlInFwd: "swirlOutFwd",
   swirlInBck: "swirlOutBck",
-  // bounce doesn't get out of the way fast enough
-  bounceInFwd: "scaleOutCenter",
-  bounceInBck: "scaleOutCenter",
+  bounceInFwd: "bounceOutFwd",
+  bounceInBck: "bounceOutBck",
+  rollInLeft: "rollOutLeft",
+  rollInRight: "rollOutRight",
+  rollInTop: "rollOutTop",
+  rollInBottom: "rollOutBottom",
 };
 
 const IS_MOBILE = !!navigator.userAgent.match(/Android|iPhone/);
@@ -121,7 +124,7 @@ function addFloaty() {
   floatyContainer.style.animationDelay = floatyDelay;
 
   const floatyContent = getRandomFloaty();
-  floatyContent.style.animation = 'scaleInCenter 1s ease'
+  floatyContent.style.animation = "scaleInCenter 1s ease";
   playEffect(floatyContent);
 
   floatyContainer.appendChild(floatyContent);
@@ -130,8 +133,8 @@ function addFloaty() {
   const floatyTTL =
     Math.random() * (MAX_FLOATY_TTL - MIN_FLOATY_TTL) + MIN_FLOATY_TTL;
   setTimeout(() => {
-    animateOut(floatyContainer, 'scaleOutCenter 1s ease');
-    addFloaty()
+    animateOut(floatyContainer, "scaleOutCenter 1s ease");
+    addFloaty();
   }, floatyTTL);
 }
 
@@ -189,25 +192,34 @@ function playEffect(element: HTMLElement) {
 }
 
 let lastDiv: HTMLElement | null = null;
+let lastEntrance: string | null = null;
 function popupChar(char: string) {
   if (char.length > 1) {
     return;
   }
 
-  const div = document.createElement("div");
+  const divWrapper = document.createElement("div");
+  divWrapper.classList.add("char");
+  divWrapper.style.position = "fixed";
+  divWrapper.style.top = 50 + (Math.random() * 40 - 20) + "%";
+  divWrapper.style.left = 50 + (Math.random() * 40 - 20) + "%";
+  divWrapper.style.transform = "translate(-50%, -50%)";
+
   const entranceEffect = getRandomEntrance();
-  div.classList.add("char");
+  const div = document.createElement("div");
   div.innerText = char;
-  div.style.animation = `${entranceEffect} 500ms ease`;
+  div.style.animation = `${entranceEffect} 1s ease`;
 
   // remove the current character with the "out" version of the animation
-  if (lastDiv) {
+  if (lastDiv && lastEntrance) {
     // @ts-ignore
-    animateOut(lastDiv, `${ENTER_EFFECTS[entranceEffect]} 500ms ease`);
+    animateOut(lastDiv, `${ENTER_EFFECTS[lastEntrance]} 500ms ease`);
   }
 
-  document.body.appendChild(div);
+  divWrapper.appendChild(div);
+  document.body.appendChild(divWrapper);
   lastDiv = div;
+  lastEntrance = entranceEffect;
 }
 
 function animateOut(element: HTMLElement, exitAnimation: string) {
