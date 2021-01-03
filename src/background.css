@@ -24,6 +24,7 @@
   position: absolute;
   animation: floaty 3s infinite alternate,
     backgroundColor 60s infinite alternate;
+    color: rgba(255, 255, 255, 0.2);
 }
 
 @keyframes background {

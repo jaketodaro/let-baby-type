@@ -1,14 +1,15 @@
 import "./index.css";
 
-const FLOATY_DURATION = 5000;
 const NUM_FLOATIES = 30;
+const FLOATY_FLOAT_DURATION = 5000;
 
-const EFFECT_DURATION = 2000;
-const EFFECT_MAX_DELAY = 5000;
+const FLOATY_EFFECT_DURATION = 2000;
+const MAX_FLOATY_EFFECT_DELAY = 5000;
+const MAX_FLOATY_TTL = 60000;
+const MIN_FLOATY_TTL = 10000;
 
 const FLOATIES = [
   "arrow-repeat",
-  "arrow-right-circle",
   "arrow-right-short",
   "asterisk",
   "book",
@@ -106,9 +107,13 @@ const IS_MOBILE = !!navigator.userAgent.match(/Android|iPhone/);
 
 // Add Floaties
 for (let i = 0; i < NUM_FLOATIES; ++i) {
-  const floatyContainer = document.createElement("div");
-  const floatyDelay = `-${Math.random() * FLOATY_DURATION}ms`;
+  addFloaty();
+}
 
+function addFloaty() {
+  const floatyContainer = document.createElement("div");
+
+  const floatyDelay = `-${Math.random() * FLOATY_FLOAT_DURATION}ms`;
   floatyContainer.classList.add("floaty");
   floatyContainer.style.top = `${Math.random() * 100}%`;
   floatyContainer.style.left = `${Math.random() * 100}%`;
@@ -116,10 +121,18 @@ for (let i = 0; i < NUM_FLOATIES; ++i) {
   floatyContainer.style.animationDelay = floatyDelay;
 
   const floatyContent = getRandomFloaty();
+  floatyContent.style.animation = 'scaleInCenter 1s ease'
   playEffect(floatyContent);
 
   floatyContainer.appendChild(floatyContent);
   document.body.appendChild(floatyContainer);
+
+  const floatyTTL =
+    Math.random() * (MAX_FLOATY_TTL - MIN_FLOATY_TTL) + MIN_FLOATY_TTL;
+  setTimeout(() => {
+    animateOut(floatyContainer, 'scaleOutCenter 1s ease');
+    addFloaty()
+  }, floatyTTL);
 }
 
 // Listen for baby smashing
@@ -170,9 +183,9 @@ function getRandomEntrance() {
 
 function playEffect(element: HTMLElement) {
   setTimeout(() => {
-    element.style.animation = `${getRandomEffect()} ${EFFECT_DURATION}ms ease`;
+    element.style.animation = `${getRandomEffect()} ${FLOATY_EFFECT_DURATION}ms ease`;
     playEffect(element);
-  }, EFFECT_DURATION + Math.random() * EFFECT_MAX_DELAY);
+  }, FLOATY_EFFECT_DURATION + Math.random() * MAX_FLOATY_EFFECT_DELAY);
 }
 
 let lastDiv: HTMLElement | null = null;
@@ -190,16 +203,20 @@ function popupChar(char: string) {
   // remove the current character with the "out" version of the animation
   if (lastDiv) {
     // @ts-ignore
-    lastDiv.style.animation = `${ENTER_EFFECTS[entranceEffect]} 500ms ease`;
-    lastDiv.addEventListener("animationend", (event) => {
-      if (event.target instanceof HTMLElement) {
-        event.target.remove();
-      }
-    });
+    animateOut(lastDiv, `${ENTER_EFFECTS[entranceEffect]} 500ms ease`);
   }
 
   document.body.appendChild(div);
   lastDiv = div;
+}
+
+function animateOut(element: HTMLElement, exitAnimation: string) {
+  element.style.animation = exitAnimation;
+  element.addEventListener("animationend", (event) => {
+    if (event.target instanceof HTMLElement) {
+      event.target.remove();
+    }
+  });
 }
 
 function forceKeyboardOpen() {

@@ -22,10 +22,3 @@ body {
   opacity: 0.8;
   z-index: 2;
 }
-
-
-.char2 {
-  font-size: min(85vw, 85vh);
-  color: white;
-  z-index: 1;
-}
