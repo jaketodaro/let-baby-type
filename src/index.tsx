@@ -8,6 +8,8 @@ const MAX_FLOATY_EFFECT_DELAY = 5000;
 const MAX_FLOATY_TTL = 60000;
 const MIN_FLOATY_TTL = 10000;
 
+const POPUP_EFFECT_DURATION = 1000;
+
 const FLOATIES = [
   "arrow-repeat",
   "arrow-right-short",
@@ -208,12 +210,12 @@ function popupChar(char: string) {
   const entranceEffect = getRandomEntrance();
   const div = document.createElement("div");
   div.innerText = char;
-  div.style.animation = `${entranceEffect} 1s ease`;
+  div.style.animation = `${entranceEffect} ${POPUP_EFFECT_DURATION}ms ease`;
 
   // remove the current character with the "out" version of the animation
   if (lastDiv && lastEntrance) {
     // @ts-ignore
-    animateOut(lastDiv, `${ENTER_EFFECTS[lastEntrance]} 500ms ease`);
+    animateOut(lastDiv, `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`);
   }
 
   divWrapper.appendChild(div);
