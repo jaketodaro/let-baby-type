@@ -1,6 +1,7 @@
 @import "./background.css";
 @import "./effects.css";
 @import "./entrances.css";
+@import "./../node_modules/bootstrap-icons/font/bootstrap-icons.css";
 
 body {
   margin: 0;
@@ -19,5 +20,12 @@ body {
   justify-content: center;
   font-size: min(80vw, 80vh);
   opacity: 0.8;
+  z-index: 2;
+}
+
+
+.char2 {
+  font-size: min(85vw, 85vh);
+  color: white;
   z-index: 1;
 }
