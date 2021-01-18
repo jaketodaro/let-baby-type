@@ -154,14 +154,20 @@ if (IS_MOBILE) {
   });
 } else {
   document.body.addEventListener("keydown", (event) => {
-    event.preventDefault();
+    if (!(event.key === "q" && event.metaKey)) {
+      event.preventDefault();
+    }
     popupChar(event.key);
   });
   document.body.addEventListener("keypress", (event) => {
-    event.preventDefault();
+    if (!(event.key === "q" && event.metaKey)) {
+      event.preventDefault();
+    }
   });
   document.body.addEventListener("keyup", (event) => {
-    event.preventDefault();
+    if (!(event.key === "q" && event.metaKey)) {
+      event.preventDefault();
+    }
   });
 }
 
@@ -214,8 +220,11 @@ function popupChar(char: string) {
 
   // remove the current character with the "out" version of the animation
   if (lastDiv && lastEntrance) {
-    // @ts-ignore
-    animateOut(lastDiv, `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`);
+    animateOut(
+      lastDiv,
+      // @ts-ignore
+      `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`
+    );
   }
 
   divWrapper.appendChild(div);
