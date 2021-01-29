@@ -21,3 +21,11 @@ body {
   opacity: 0.8;
   z-index: 2;
 }
+
+:focus {
+  outline: none;
+}
+
+[contenteditable] {
+  caret-color: transparent;
+}
