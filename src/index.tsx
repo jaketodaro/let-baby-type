@@ -118,7 +118,10 @@ for (let i = 0; i < NUM_FLOATIES; ++i) {
 }
 
 document.body.addEventListener("click", (event) => {
-  if (event.target instanceof HTMLElement && !event.target.matches(".char > div")) {
+  if (
+    event.target instanceof HTMLElement &&
+    !event.target.matches(".char > div")
+  ) {
     popupChar(" ");
   }
 });
@@ -249,7 +252,7 @@ function popupChar(char: string) {
       lastDiv,
       // @ts-ignore
       `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`,
-      () => div.removeEventListener("click", onCharClick)
+      (element) => element.removeEventListener("click", onCharClick)
     );
   }
 
@@ -262,15 +265,19 @@ function popupChar(char: string) {
 function animateOut(
   element: HTMLElement,
   exitAnimation: string,
-  callback?: () => void
+  callback?: (element: HTMLElement) => void
 ) {
   element.style.animation = exitAnimation;
-  element.addEventListener("animationend", (event) => {
+
+  function onAnimationEnd(event: AnimationEvent) {
     if (event.target instanceof HTMLElement) {
-      callback?.();
-      event.target.remove();
+      element.removeEventListener("animationend", onAnimationEnd);
+      callback?.(element);
+      element.remove();
     }
-  });
+  }
+
+  element.addEventListener("animationend", onAnimationEnd);
 }
 
 function forceKeyboardOpen() {
