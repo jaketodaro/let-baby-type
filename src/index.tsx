@@ -110,10 +110,18 @@ const ENTER_EFFECTS = {
 
 const IS_MOBILE = !!navigator.userAgent.match(/Android|iPhone/);
 
+const effectTimeoutsByElement = new Map();
+
 // Add Floaties
 for (let i = 0; i < NUM_FLOATIES; ++i) {
   addFloaty();
 }
+
+document.body.addEventListener("click", (event) => {
+  if (event.target instanceof HTMLElement && !event.target.matches(".char > div")) {
+    popupChar(" ");
+  }
+});
 
 function addFloaty() {
   const floatyContainer = document.createElement("div");
@@ -124,10 +132,11 @@ function addFloaty() {
   floatyContainer.style.left = `${Math.random() * 100}%`;
   floatyContainer.style.fontSize = 1 + Math.random() * 4 + "rem";
   floatyContainer.style.animationDelay = floatyDelay;
+  floatyContainer.addEventListener("click", onFloatyClick);
 
   const floatyContent = getRandomFloaty();
   floatyContent.style.animation = "scaleInCenter 1s ease";
-  playEffect(floatyContent);
+  playEffectLoop(floatyContent);
 
   floatyContainer.appendChild(floatyContent);
   document.body.appendChild(floatyContainer);
@@ -135,7 +144,9 @@ function addFloaty() {
   const floatyTTL =
     Math.random() * (MAX_FLOATY_TTL - MIN_FLOATY_TTL) + MIN_FLOATY_TTL;
   setTimeout(() => {
-    animateOut(floatyContainer, "scaleOutCenter 1s ease");
+    animateOut(floatyContainer, "scaleOutCenter 1s ease", () => {
+      floatyContainer.removeEventListener("click", onFloatyClick);
+    });
     addFloaty();
   }, floatyTTL);
 }
@@ -192,11 +203,24 @@ function getRandomEntrance() {
   return keys[Math.floor(Math.random() * keys.length)];
 }
 
-function playEffect(element: HTMLElement) {
-  setTimeout(() => {
-    element.style.animation = `${getRandomEffect()} ${FLOATY_EFFECT_DURATION}ms ease`;
-    playEffect(element);
+function playEffectOnce(element: HTMLElement) {
+  element.style.animation = `${getRandomEffect()} ${FLOATY_EFFECT_DURATION}ms ease`;
+}
+
+function playEffectLoop(element: HTMLElement) {
+  playEffectOnce(element);
+
+  const existingTimeout = effectTimeoutsByElement.get(element);
+  if (existingTimeout) {
+    clearTimeout(existingTimeout);
+    effectTimeoutsByElement.delete(element);
+  }
+
+  const timeoutID = setTimeout(() => {
+    playEffectLoop(element);
   }, FLOATY_EFFECT_DURATION + Math.random() * MAX_FLOATY_EFFECT_DELAY);
+
+  effectTimeoutsByElement.set(element, timeoutID);
 }
 
 let lastDiv: HTMLElement | null = null;
@@ -217,13 +241,15 @@ function popupChar(char: string) {
   const div = document.createElement("div");
   div.innerText = char;
   div.style.animation = `${entranceEffect} ${POPUP_EFFECT_DURATION}ms ease`;
+  div.addEventListener("click", onCharClick);
 
   // remove the current character with the "out" version of the animation
   if (lastDiv && lastEntrance) {
     animateOut(
       lastDiv,
       // @ts-ignore
-      `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`
+      `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`,
+      () => div.removeEventListener("click", onCharClick)
     );
   }
 
@@ -233,10 +259,15 @@ function popupChar(char: string) {
   lastEntrance = entranceEffect;
 }
 
-function animateOut(element: HTMLElement, exitAnimation: string) {
+function animateOut(
+  element: HTMLElement,
+  exitAnimation: string,
+  callback?: () => void
+) {
   element.style.animation = exitAnimation;
   element.addEventListener("animationend", (event) => {
     if (event.target instanceof HTMLElement) {
+      callback?.();
       event.target.remove();
     }
   });
@@ -247,4 +278,16 @@ function forceKeyboardOpen() {
     document.getElementById("input")?.focus();
     forceKeyboardOpen();
   });
+}
+
+function onFloatyClick(event: MouseEvent) {
+  if (event.target instanceof HTMLElement) {
+    playEffectLoop(event.target);
+  }
+}
+
+function onCharClick(event: MouseEvent) {
+  if (event.target instanceof HTMLElement) {
+    playEffectOnce(event.target);
+  }
 }

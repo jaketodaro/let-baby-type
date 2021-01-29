@@ -13,6 +13,7 @@ body {
 }
 
 .char {
+  cursor: pointer;
   position: fixed;
   font-size: min(80vw, 80vh);
   text-shadow: 0 0 min(3vw, 3vh) white;

@@ -21,6 +21,7 @@
 }
 
 .floaty {
+  cursor: pointer;
   position: absolute;
   animation: floaty 3s infinite alternate,
     backgroundColor 60s infinite alternate;
