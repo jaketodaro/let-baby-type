@@ -140,7 +140,7 @@ function addFloaty() {
   const floatyContent = getRandomFloaty();
   floatyContent.style.animation = "scaleInCenter 1s ease";
   // So the keyboard on mobile stays open
-  floatyContent.setAttribute('contenteditable', '')
+  floatyContent.setAttribute("contenteditable", "");
   playEffectLoop(floatyContent);
 
   floatyContainer.appendChild(floatyContent);
@@ -248,7 +248,7 @@ function popupChar(char: string) {
   div.style.animation = `${entranceEffect} ${POPUP_EFFECT_DURATION}ms ease`;
   div.addEventListener("click", onCharClick);
   // So the keyboard on mobile stays open
-  div.setAttribute('contenteditable', '')
+  div.setAttribute("contenteditable", "");
 
   // remove the current character with the "out" version of the animation
   if (lastDiv && lastEntrance) {
@@ -256,7 +256,10 @@ function popupChar(char: string) {
       lastDiv,
       // @ts-ignore
       `${ENTER_EFFECTS[lastEntrance]} ${POPUP_EFFECT_DURATION}ms ease`,
-      (element) => element.removeEventListener("click", onCharClick)
+      (element) => {
+        element.removeEventListener("click", onCharClick);
+        element.parentElement?.remove();
+      }
     );
   }
 
